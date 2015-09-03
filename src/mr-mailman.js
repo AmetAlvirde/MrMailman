@@ -1,25 +1,6 @@
 /*jslint node: true, indent: 2,nomen:true */
 'use strict';
 
-/*
-*
-* JSON RECEIVED:
-* {
-*   auth: {
-*     user: "user",
-*     password: "password",
-*     service: "service@host.com"
-*   },
-*   content: {
-*     templateURL: 'path/to/markdown',
-*     replaces:   [{$0: 'Mr.'}, {$1: 'Alvirde'}...],
-*     subject:    ''the subject'
-*   },
-*   receivers: [{mail: 'hola@gmail.com', name: 'hola'}...]
-* }
-*
-* */
-
 var fs            = require('fs'),
   mailer,
   mailover        = require('mailover'),
