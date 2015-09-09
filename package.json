@@ -3,6 +3,8 @@
   "description": "Send mails based on a markdown template with regex replacement",
   "dependencies": {
     "mailover": "^1.0.1",
+    "q": "^1.4.1",
+    "ramda": "^0.17.1",
     "rwlock": "^5.0.0"
   },
   "private": true,

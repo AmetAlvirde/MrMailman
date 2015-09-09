@@ -4,16 +4,24 @@ module.exports = function (grunt) {
 
   // Project configuration.
   grunt.initConfig({
-    pkg     : grunt.file.readJSON('package.json'),
-    jslint  : {
-      all     : {
-        src : [ 'package.json', 'Gruntfile.js', 'lib/*.js'],
-        directives : {
-          indent : 2,
-          node   : true,
-          nomen  : true,
-          regexp : true
-        }
+    pkg: grunt.file.readJSON('package.json'),
+    jslint: {
+      all: {
+        directives: {
+          indent: 2,
+          node:   true,
+          nomen:  true,
+          regexp: true
+        },
+        exclude: [
+          'demo/hola.md'
+        ],
+        src: [
+          'package.json',
+          'Gruntfile.js',
+          'demo/*',
+          'lib/*.js'
+        ]
       }
     },
     uglify: {
