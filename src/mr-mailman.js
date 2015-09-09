@@ -1,81 +1,83 @@
 /*jslint node: true, indent: 2*/
 'use strict';
 
-var fs            = require('fs'),
-  Q = require('q'),
-  mailer,
-  mailover        = require('mailover'),
-  R               = require('ramda'),
-  ReadWriteLock   = require('rwlock');
+var fs               = require('fs'),
+  Q                  = require('q'),
+  nodemailerMarkdown = require('nodemailer-markdown').markdown,
+  nodemailer         = require('nodemailer'),
+  R                  = require('ramda'),
+  ReadWriteLock      = require('rwlock');
 
-module.exports = {
-  deliver: function (mailOptions) {
-    var transport = {
-        auth: {}
-      },
-      mail = {
-        markdown: {
-          path: {}
-        }
-      };
+function deliverMails(from, receivers, subject, markdown, passenger) {
+  var mail    = {},
+    transport = nodemailer.createTransport(passenger);
 
-    transport.service   = mailOptions.auth.service;
-    transport.auth.user = mailOptions.auth.user;
-    transport.auth.pass = mailOptions.auth.password;
+  R.forEach(function (receiver) {
+    mail.from     = from;
+    mail.to       = receiver;
+    mail.subject  = subject;
+    mail.markdown = markdown;
 
-    spyAndReplace(
-        mailOptions.content.replaces,
-        mailOptions.content.templateURL
-      )
-      .then(function (data) {
-        deliverMails(
-          mailOptions.content.from,
-          mailOptions.content.receivers,
-          mailOptions.content.subject,
-          data,
-          mail
-        );
-      });
-  }
-};
+    transport.use('compile', nodemailerMarkdown());
+    transport.sendMail(mail, function (error, info) {
+      console.log('sending mail');
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Message sent: ' + info.response);
+      }
+    });
+  }, receivers);
+}
 
-function spyAndReplace (replaces, templateURL) {
-  var lock = new ReadWriteLock(),
+function spyAndReplace(replaces, templateURL) {
+  var lock   = new ReadWriteLock(),
     deferred = Q.defer();
 
   lock.writeLock(function (release) {
-     Q.nfcall(fs.readFile, templateURL, 'utf-8')
-      .then(function (data) {
+    Q.nfcall(fs.readFile, templateURL, 'utf-8')
+      .then(function (markdown) {
         var wordToReplace,
           regex;
 
         R.forEach(function (replace) {
           wordToReplace = R.keys(replace)[0];
-
-          regex = new RegExp(wordToReplace, 'g')
-          data = data.replace(regex, replace[wordToReplace]);
+          regex         = new RegExp(wordToReplace, 'g');
+          markdown      = markdown.replace(regex, replace[wordToReplace]);
         }, replaces);
 
         release();
-
-        deferred.resolve(data);
-    });
+        deferred.resolve(markdown);
+      })
+      .catch(function (err) {
+        console.log(err);
+      });
   });
-
   return deferred.promise;
 }
 
-function deliverMails (from, receivers, subject, data, mail) {
-  R.forEach(function (person) {
-    console.log(person);
-    mail.from          = from;
-    mail.to            = person;
-    mail.subject       = subject;
-    mail.markdown.path = data;
+module.exports = {
+  deliver: function (mailOptions) {
+    var passenger = {
+      service: mailOptions.auth.service,
+      auth: {
+        user: mailOptions.auth.user,
+        pass: mailOptions.auth.password
+      }
+    };
 
-    console.log('ASDFASDFASD');
-    console.log(mail);
-    mailer = mailover(transport);
-    mailer.send(mail);
-  }, receivers);
-}
+    spyAndReplace(
+      mailOptions.content.replaces,
+      mailOptions.content.templateURL
+    )
+      .then(function (markdown) {
+        deliverMails(
+          mailOptions.content.from,
+          mailOptions.content.receivers,
+          mailOptions.content.subject,
+          markdown,
+          passenger
+        );
+      });
+  }
+};

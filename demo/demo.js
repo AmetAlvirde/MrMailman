@@ -4,20 +4,18 @@
 var MrMailman = require('../src/mr-mailman'),
   letter = {
     auth: {
-      password: "DeArUb@Google2011@212",
-      service:  "gmail",
-      user:     "Amet.Alvirde"
+      password: "Password",
+      service:  "Service (e.g. Gmail)",
+      user:     "Mail"
     },
     content: {
-      from:        'Amet Alvirde',
-      receivers:   ['a.metalvirde@gmail.com'],
-      replaces:    [{'<<0>>': 'Amet'}, {'<<1>>': 'hola'}],
-      subject:     'Noticias súper secretas',
+      from:        'MrMailman',
+      receivers:   ['your@lovely.inbox'],
+      replaces:    [{'<<0>>': 'Mr.Mailman'}, {'<<1>>': 'hello'}],
+      subject:     'MrMailman Greetings',
       templateURL: './hola.md'
     }
   };
 
 MrMailman.deliver(letter);
-
-console.log('DONE');
 

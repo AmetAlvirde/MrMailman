@@ -20,7 +20,7 @@ module.exports = function (grunt) {
           'package.json',
           'Gruntfile.js',
           'demo/*',
-          'lib/*.js'
+          'src/*.js'
         ]
       }
     },
@@ -41,4 +41,12 @@ module.exports = function (grunt) {
     'jslint',
     'uglify'
   ]);
+
+  grunt.registerTask('lint', [
+    'jslint'
+  ]);
+
+
+
+
 };

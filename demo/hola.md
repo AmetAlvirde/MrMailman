@@ -1,3 +1,3 @@
 # Hola
 
-Dice <<0>> que <<1>>
+<<0>> wants to say <<1>>
