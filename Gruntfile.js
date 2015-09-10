@@ -17,11 +17,30 @@ module.exports = function (grunt) {
           'demo/hola.md'
         ],
         src: [
-          'package.json',
-          'Gruntfile.js',
           'demo/*',
-          'src/*.js'
+          'Gruntfile.js',
+          'package.json',
+          'src/*.js',
+          'tests/*.js'
         ]
+      }
+    },
+    mochaTest: {
+      test: {
+        options: {
+          captureFile: 'reports/mr-mailman-report.txt',
+          quiet:       false,
+          reporter:    'spec'
+        },
+        src: (function () {
+          var specificTest = grunt.option('specific-test');
+
+          if (specificTest) {
+            return ['test/' + specificTest + '.test.js'];
+          }
+
+          return ['tests/*.tests.js'];
+        }())
       }
     },
     uglify: {
@@ -33,12 +52,14 @@ module.exports = function (grunt) {
     }
   });
 
-  grunt.loadNpmTasks('grunt-jslint');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-jslint');
+  grunt.loadNpmTasks('grunt-mocha-test');
 
   // Default task(s).
   grunt.registerTask('default', [
     'jslint',
+    'mochaTest',
     'uglify'
   ]);
 
@@ -46,6 +67,9 @@ module.exports = function (grunt) {
     'jslint'
   ]);
 
+  grunt.registerTask('test', [
+    'mochaTest'
+  ]);
 
 
 
