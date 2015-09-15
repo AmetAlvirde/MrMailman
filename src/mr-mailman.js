@@ -10,6 +10,7 @@ var fs               = require('fs'),
 
 function deliverMails(from, receivers, subject, markdown, passenger) {
   var mail    = {},
+    result,
     transport = nodemailer.createTransport(passenger);
 
   R.forEach(function (receiver) {
@@ -20,14 +21,17 @@ function deliverMails(from, receivers, subject, markdown, passenger) {
 
     transport.use('compile', nodemailerMarkdown());
     transport.sendMail(mail, function (error, info) {
-      console.log('sending mail');
       if (error) {
+        result = error;
         console.log(error);
       } else {
+        result = info.response;
         console.log('Message sent: ' + info.response);
       }
     });
   }, receivers);
+
+  return result;
 }
 
 function spyAndReplace(replaces, templateURL) {
@@ -79,5 +83,7 @@ module.exports = {
           passenger
         );
       });
-  }
+  },
+  spyAndReplace: spyAndReplace,
+  deliverMails:  deliverMails
 };
