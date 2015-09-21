@@ -2,6 +2,8 @@
   "name": "MrMailman",
   "description": "Send mails based on a markdown template with regex replacement",
   "dependencies": {
+    "mailcomposer": "^0.2.12",
+    "mailgun": "^0.5.0",
     "nodemailer": "^1.4.0",
     "nodemailer-markdown": "^1.0.0",
     "q": "^1.4.1",

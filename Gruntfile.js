@@ -14,7 +14,7 @@ module.exports = function (grunt) {
           regexp: true
         },
         exclude: [
-          'demo/hola.md'
+          'demo/hola.html'
         ],
         src: [
           'demo/*',

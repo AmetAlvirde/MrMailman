@@ -1,37 +1,41 @@
 /*jslint node: true, indent: 2*/
 'use strict';
 
-var fs               = require('fs'),
-  Q                  = require('q'),
-  nodemailerMarkdown = require('nodemailer-markdown').markdown,
-  nodemailer         = require('nodemailer'),
-  R                  = require('ramda'),
-  ReadWriteLock      = require('rwlock');
+var fs          = require('fs'),
+  MailComposer  = require('mailcomposer').MailComposer,
+  Mailgun       = require('mailgun'),
+  Q             = require('q'),
+  R             = require('ramda'),
+  ReadWriteLock = require('rwlock');
 
 function deliverMails(from, receivers, subject, markdown, passenger) {
-  var mail    = {},
-    result,
-    transport = nodemailer.createTransport(passenger);
+  var mailcomposer = new MailComposer({forceEmbeddedImages: true});
 
   R.forEach(function (receiver) {
-    mail.from     = from;
-    mail.to       = receiver;
-    mail.subject  = subject;
-    mail.markdown = markdown;
+    mailcomposer.setMessageOption({
+      from:     from,
+      to:       receiver,
+      subject:  subject,
+      markdown: markdown
+    });
 
-    transport.use('compile', nodemailerMarkdown());
-    transport.sendMail(mail, function (error, info) {
-      if (error) {
-        result = error;
-        console.log(error);
-      } else {
-        result = info.response;
-        console.log('Message sent: ' + info.response);
-      }
+    mailcomposer.buildMessage(function (err, messageSource) {
+      if (err) { throw err; }
+      var mailgun = new Mailgun.Mailgun(passenger.auth.mailgunKey);
+      mailgun.sendRaw(
+        'TutorOnline - Bienvenido <ayuda@tutoronline.la>',
+        receiver,
+        messageSource,
+        function (err) {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log('messageSent');
+          }
+        }
+      );
     });
   }, receivers);
-
-  return result;
 }
 
 function spyAndReplace(replaces, templateURL) {
@@ -63,12 +67,11 @@ function spyAndReplace(replaces, templateURL) {
 module.exports = {
   deliver: function (mailOptions) {
     var passenger = {
-      service: mailOptions.auth.service,
       auth: {
-        user: mailOptions.auth.user,
-        pass: mailOptions.auth.password
+        mailgunKey: mailOptions.auth.mailgunKey
       }
     };
+
 
     spyAndReplace(
       mailOptions.content.replaces,

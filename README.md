@@ -7,16 +7,16 @@ like so:
 ```javascript
 {
   auth: {
-    password: "Password",
-    service:  "Service (e.g. Gmail)",
-    user:     "Mail"
+    mailgunKey: 'your-mailgun-key'
   },
   content: {
     from:        'MrMailman',
     receivers:   ['your@lovely.inbox'],
     replaces:    [{'<<0>>': 'Mr.Mailman'}, {'<<1>>': 'hello'}],
     subject:     'MrMailman Greetings',
-    template:    './hola.md'
+    templateURL: './hola.html'
   }
-}
+};
 ```
+
+Mr.Mailman uses mailgun and html templates to send your mails.

@@ -9,16 +9,16 @@ var expect  = require('chai').expect,
 
 
 describe('Deliver a mail', function () {
-  it('should read a markdown file and replace its regular expressions',
+  it('should read an html file and replace its regular expressions',
     function (done) {
       var replaces = [{'<<0>>': 'Mr.Mailman'}, {'<<1>>': 'hello'}],
-        templateURL = './demo/hola.md';
+        templateURL = './demo/hola.html';
 
       MrMailman.spyAndReplace(replaces, templateURL)
         .then(function (replacedMarkdown) {
           expect(replacedMarkdown).to.be.a('string');
           expect(replacedMarkdown)
-            .to.equal('#Hola\n\n*Mr.Mailman* wants to say hello\n');
+            .to.equal('<html><body><p><b>Hola</b>,Mr.Mailman wants to say hello.<p></body></html>\n');
           done();
         })
         .catch(function (err) {
